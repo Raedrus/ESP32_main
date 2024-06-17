@@ -231,11 +231,25 @@ void loop()
 
     if (data == "Test")
     {
+      int timeout_counter = 0;
       Serial.println("Testing Mode");
+      while (true)
+      {
+        delay(0.01);
+        if (Serial.available() > 0){
+          break;
+        }
+        timeout_counter ++;
+        if (timeout_counter > 100)
+        {
+          Serial.println("Exit Testing Mode (TIMEOUT)");
+          break;
+        }
+      }
 
       if (data == "LED")
       {
-        
+
       }
       
     }
