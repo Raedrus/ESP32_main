@@ -14,28 +14,36 @@
 #define STARTBUTTON_PIN 2
 
 // TMC2209 stepper driver initiation
-#define DIR_PIN 13           // Direction
-#define STEP_PIN 12          // Step
-#define STALL_PIN 11         // Connected to DIAG pin on the TMC2209
+#define DIR_PIN 13          // Direction
+#define STEP_PIN 12         // Step
+#define STALL_PIN 11        // Connected to DIAG pin on the TMC2209
 #define driver_ADDRESS 0b00 // Pins MS1 and MS2 connected to GND.
-#define STALL_VALUE 100      // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
-#define RA_SENSE 0.11f       // Sense resistor value, match to your driverA
+#define STALL_VALUE 100     // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
+#define RA_SENSE 0.11f      // Sense resistor value, match to your driverA
 TMC2209Stepper driver(&Serial2, RA_SENSE, driver_ADDRESS);
 constexpr uint32_t steps_per_round = 3000 * (60 / 16); // Calculation for steps per round required.
 AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
 bool startup = true; // set false after homing
 bool stalled = false;
 
+// Servo initiation
+Servo lid_servo;
+Servo gate_servo;
+int lid_init_pos = 0;
+int gate_init_pos = 0;
+#define LID_SERVO_PIN 26
+#define GATE_SERVO_PIN 25
+
 // Button debouncing variables
 #define DEBOUNCE_TIME 40
 volatile bool intflag = false;
 unsigned long lastDebounceTime = 0;
 
-// Function declarations
-void IRAM_ATTR EstopInterrupt();
-void IRAM_ATTR stallInterrupt();
-void gripperOpen();
-void gripperClose();
+// // Function declarations
+// void IRAM_ATTR EstopInterrupt();
+// void IRAM_ATTR stallInterrupt();
+// void gripperOpen();
+// void gripperClose();
 
 // EStop interrupt routine
 void IRAM_ATTR EstopInterrupt()
@@ -50,6 +58,7 @@ void IRAM_ATTR stallInterrupt()
   stalled = true; // Stall flag set when stepper motor stalls
 }
 
+// Function to open the gripper
 void gripperOpen()
 {
   stepper.move(-100 * steps_per_round); // Move 100mm
@@ -61,6 +70,7 @@ void gripperOpen()
   stalled = false;
 }
 
+// Function to close the gripper
 void gripperClose()
 {
   stepper.move(100 * steps_per_round); // Move 100mm
@@ -70,6 +80,26 @@ void gripperClose()
   }
   stepper.setCurrentPosition(0); // Set current position as home
   stalled = false;
+}
+
+// Function to open the input lid
+void lidOpen()
+{
+}
+
+// Function to close the input lid
+void lidClose()
+{
+}
+
+// Function to open the gate
+void gateOpen()
+{
+}
+
+// Function to close the gate
+void gateClose()
+{
 }
 
 void setup()
@@ -110,6 +140,22 @@ void setup()
   stepper.enableOutputs();
 
   gripperOpen(); // Open the gripper
+
+  // Allow allocation of all timers
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  lid_servo.setPeriodHertz(50);               // Set period for servo
+  lid_servo.attach(LID_SERVO_PIN, 500, 2400); // Attaches the servo at pin 26 to its servo object
+  lid_servo.write(lid_init_pos);              // Moves the servo to desired home position
+
+  gate_servo.setPeriodHertz(50);                // Set period for servo
+  gate_servo.attach(GATE_SERVO_PIN, 500, 2400); // Attaches the servo pin 25 to its servo object
+  gate_servo.write(gate_init_pos);              // Moves the servo to desired home position
+  // using default min/max of 1000us and 2000us
+  // different servos may require different min/max settings
+  // for an accurate 0 to 180 sweep
 }
 
 void loop()
@@ -119,32 +165,67 @@ void loop()
     String data = Serial.readStringUntil('\n'); // Read command from Pi
     Serial.println("OK");                       // Feedback to Pi on receiving command
 
-    if (data == "EMAGNET_ON")
+    if (data == "EMAGNET_ON") // Turn on electromagnet cluster
     {
-      digitalWrite(EMAGNET_PIN, HIGH); // Turn on electromagnet cluster
+      digitalWrite(EMAGNET_PIN, HIGH); 
     }
-    else if (data == "EMAGNET_OFF")
+    else if (data == "EMAGNET_OFF") // Turn off electromagnet cluster
     {
-      digitalWrite(EMAGNET_PIN, LOW); // Turn off electromagnet cluster
+      digitalWrite(EMAGNET_PIN, LOW); 
     }
-    else if (data == "L")
+    else if (data == "LIGHTS_ON")  // Turn on LED strip
     {
-      digitalWrite(LEDSTRIP_PIN, HIGH); // Turn on LED strip (example action)
+      digitalWrite(LEDSTRIP_PIN, HIGH); 
     }
-    else if (data == "S")
+    else if (data == "LIGHTS_OFF")  // Turn off LED strip
     {
-      // Handle servo control (example action)
+      digitalWrite(LEDSTRIP_PIN, LOW); 
+    }
+    else if (data == "LID_OPEN")  //Open the input lid
+    {
+      lid_servo.write(90);  //Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "G_OPEN")
+    else if (data == "LID_CLOSE") //Close the input lid
     {
-      gripperOpen(); // Open gripper
+      lid_servo.write(90);  //Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "G_CLOSE")
+    else if (data == "GATE_OPEN") //Open the gate
     {
-      gripperClose(); // Close gripper
+      gate_servo.write(90);  //Position can be adjusted as desired
       Serial.println("Done");
+    }
+    else if (data == "GATE_CLOSE")  //Close the gate
+    {
+      gate_servo.write(90);  //Position can be adjusted as desired
+      Serial.println("Done");
+    }
+    else if (data == "G_OPEN")  // Open gripper
+    {
+      gripperOpen(); 
+      Serial.println("Done");
+    }
+    else if (data == "G_CLOSE") // Close gripper
+    {
+      gripperClose(); 
+      Serial.println("Done");
+    }
+    else if (data == "GLED_ON") // Turn on Green LED
+    {
+      digitalWrite(GREENLED_PIN, HIGH);
+    }
+    else if (data == "GLED_OFF")  // Turn off Green LED
+    {
+      digitalWrite(GREENLED_PIN, LOW);
+    }
+    else if (data == "RLED_ON") // Turn on Red LED
+    {
+      digitalWrite(REDLED_PIN, HIGH);
+    }
+    else if (data == "RLED_OFF")  // Turn off Red LED
+    {
+      digitalWrite(REDLED_PIN, LOW);
     }
   }
 }
