@@ -227,5 +227,17 @@ void loop()
     {
       digitalWrite(REDLED_PIN, LOW);
     }
+
+
+    if (data == "Test")
+    {
+      Serial.println("Testing Mode");
+
+      if (data == "LED")
+      {
+        
+      }
+      
+    }
   }
 }
