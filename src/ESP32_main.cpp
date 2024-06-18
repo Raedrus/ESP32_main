@@ -123,6 +123,10 @@ void setup()
   // Enable interrupt for motor stall
   attachInterrupt(digitalPinToInterrupt(STALL_PIN), stallInterrupt, RISING);
 
+  // TMC2209 Driver Reset
+  driver.toff(0); //  Disable driver
+  delay(10); // Small delay to ensure the driver is properly disabled
+  driver.toff(5); // Enable driver
   TMC2209settings(); // Initialize TMC2209 Stepper Driver
 
   gripperOpen(); // Open the gripper
@@ -480,3 +484,4 @@ void TestLoop()
       break;
     }
   }
+}
