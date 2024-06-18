@@ -243,233 +243,240 @@ void loop()
 
 void TestLoop()
 {
-    int timeout_counter = 0;
-    Serial.print("Testing Mode. Input test command or exit: ");
+  int timeout_counter = 0;
+  Serial.print("Testing Mode. Input test command or exit: ");
 
-    while (true)
+  while (true)
+  {
+    delay(10); // Delay 10ms
+    timeout_counter++;
+    if (Serial.available() > 0)
     {
-        delay(10); // Delay 10ms
-        timeout_counter++;
-        if (Serial.available() > 0)
+      String data = Serial.readStringUntil('\n'); // Read test command
+
+      if (data == "EMAGNET")
+      {
+        // code for turning on Magnet for 5 sec
+        Serial.println("Initiating MAGNET Test...");
+        digitalWrite(EMAGNET_PIN, HIGH);
+        delay(5000); // Delay for 5 sec
+        digitalWrite(EMAGNET_PIN, LOW);
+        Serial.println("Check Done");
+
+        TestLoop(); // Go back to start of TestLoop
+      }
+
+      else if (data == "LED")
+      {
+        // code for turning on LED for 5 sec
+        Serial.println("Initiating LED Strip Test...");
+        digitalWrite(LEDSTRIP_PIN, HIGH);
+        delay(5000); // Delay for 5 sec
+        digitalWrite(LEDSTRIP_PIN, LOW);
+        Serial.println("Check Done");
+
+        TestLoop(); // Go back to start of TestLoop
+      }
+
+      else if (data == "GLED")
+      {
+        // code for turning on Green LED for 5 sec
+        Serial.println("Initiating Green LED Test...");
+        digitalWrite(GREENLED_PIN, HIGH);
+        delay(5000); // Delay for 5 sec
+        digitalWrite(GREENLED_PIN, LOW);
+        Serial.println("Check Done");
+
+        TestLoop(); // Go back to start of TestLoop
+      }
+
+      else if (data == "RLED")
+      {
+        // code for turning on Red LED for 5 sec
+        Serial.println("Initiating Red LED Test...");
+        digitalWrite(REDLED_PIN, HIGH);
+        delay(5000); // Delay for 5 sec
+        digitalWrite(REDLED_PIN, LOW);
+        Serial.println("Check Done");
+
+        TestLoop(); // Go back to start of TestLoop
+      }
+
+      else if (data == "LID")
+      {
+        // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
+        Serial.print("Initiating LID servo Test...\nLid Position (max 100): ");
+
+        lid_servo.write(lid_init_pos); // Home Position
+        int lid_servoPos;              // Current Position
+        lid_servoPos = lid_init_pos;
+
+        while (true)
         {
-            String data = Serial.readStringUntil('\n'); // Read test command
+          delay(15);
 
-            if (data == "EMAGNET")
+          // code for rotating LID servo
+          if (Serial.available() > 0)
+          {
+            String info_servo;
+            info_servo = "";
+            String return_text;
+            info_servo = Serial.readStringUntil('\n'); // read input integer
+
+            if (info_servo.toInt() < 0 || info_servo.toInt() > 100) // setting input limit
             {
-                // code for turning on Magnet for 5 sec
-                Serial.println("Initiating MAGNET Test...");
-                digitalWrite(EMAGNET_PIN, HIGH);
-                delay(5000); // Delay for 5 sec
-                digitalWrite(EMAGNET_PIN, LOW);
-                Serial.println("Check Done");
-
-                TestLoop(); // Go back to start of TestLoop
+              Serial.print("Out of limit (max 100)\nLid Position (max 100): ");
+              continue;
             }
 
-            else if (data == "LED")
+
+            // return the info variable for confirmation
+            return_text = "info_servo variable string is: " + info_servo;
+            Serial.println(return_text);
+
+            // rotate servo to desired position
+            if (info_servo.toInt() < lid_servoPos)
             {
-                // code for turning on LED for 5 sec
-                Serial.println("Initiating LED Strip Test...");
-                digitalWrite(LEDSTRIP_PIN, HIGH);
-                delay(5000); // Delay for 5 sec
-                digitalWrite(LEDSTRIP_PIN, LOW);
-                Serial.println("Check Done");
-
-                TestLoop(); // Go back to start of TestLoop
+              for (0; lid_servoPos > info_servo.toInt(); lid_servoPos -= 1)
+              {
+                lid_servo.write(lid_servoPos);
+                delay(5);
+              }
             }
-
-            else if (data == "GLED"){
-                // code for turning on Green LED for 5 sec
-                Serial.println("Initiating Green LED Test...");
-                digitalWrite(GREENLED_PIN, HIGH);
-                delay(5000); // Delay for 5 sec
-                digitalWrite(GREENLED_PIN, LOW);
-                Serial.println("Check Done");
-
-                TestLoop(); // Go back to start of TestLoop
-            }
-
-            else if (data == "RLED"){
-                // code for turning on Red LED for 5 sec
-                Serial.println("Initiating Red LED Test...");
-                digitalWrite(REDLED_PIN, HIGH);
-                delay(5000); // Delay for 5 sec
-                digitalWrite(REDLED_PIN, LOW);
-                Serial.println("Check Done");
-
-                TestLoop(); // Go back to start of TestLoop
-
-            }
-
-
-            else if (data == "LID")
+            else if (info_servo.toInt() > lid_servoPos)
             {
-                // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
-                Serial.print("Initiating LID servo Test...\nLid Position (max 100): ");
-
-                lid_servo.write(lid_init_pos); // Home Position
-                int lid_servoPos;              // Current Position
-                lid_servoPos = lid_init_pos
-
-                    While(true)
-                {
-                    delay(15);
-
-                    // code for rotating LID servo
-                    if (Serial.available() > 0)
-                    {
-                        String info_servo;
-                        info_servo = "";
-                        String return_text;
-                        info_servo = Serial.readStringUntil('\n'); // read input integer
-
-                        if (info_servo < 0 || info_servo > 100) // setting input limit
-                            Serial.print("Out of limit (max 100)\nLid Position (max 100): ") continue;
-
-                        // return the info variable for confirmation
-                        return_text = "info_servo variable string is: " + info_servo;
-                        Serial.println(return_text);
-
-                        // rotate servo to desired position
-                        if (info.toInt() < lid_servoPos)
-                        {
-                            for (0; lid_servoPos > info.toInt(); lid_servoPos -= 1)
-                            {
-                                lid_servo.write(lid_servoPos);
-                                delay(5);
-                            }
-                        }
-                        else if (info.toInt() > lid_servoPos)
-                        {
-                            for (0; lid_servoPos < info.toInt(); lid_servoPos += 1)
-                            {
-                                lid_servo.write(lid_servoPos);
-                                delay(5);
-                            }
-                        }
-
-                        else
-                        {
-                            delay(5);
-                        }
-                        break;
-                    }
-                }
-
-                delay(2500); // stop for 2.5 sec
-
-                // rotate back to Home Position
-                if (lid_init_pos < lid_servoPos)
-                {
-                    for (0; lid_servoPos > lid_init_pos; lid_servoPos -= 1)
-                    {
-                        gate_servo.write(lid_servoPos);
-                        delay(5);
-                    }
-                }
-                else if (lid_init_pos > lid_servoPos)
-                {
-                    for (0; lid_servoPos < lid_init_pos; lid_servoPos += 1)
-                    {
-                        lid_servo.write(lid_servoPos);
-                        delay(5);
-                    }
-                }
-
-                Serial.println("Check Done");
+              for (0; lid_servoPos < info_servo.toInt(); lid_servoPos += 1)
+              {
+                lid_servo.write(lid_servoPos);
+                delay(5);
+              }
             }
 
-            else if (data == "GATE")
+            else
             {
-                // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
-                Serial.print("Initiating GATE servo Test...\nGate Position (max 100): ");
-
-                gate_servo.write(gate_init_pos); // Home Position
-                int gate_servoPos;               // Current Position
-                gate_servoPos = gate_init_pos
-
-                    While(true)
-                {
-                    delay(15);
-
-                    // code for rotating Gate servo
-                    if (Serial.available() > 0)
-                    {
-                        String info_servo;
-                        info_servo = "";
-                        String return_text;
-                        info_servo = Serial.readStringUntil('\n'); // read input integer
-
-                        if (info_servo < 0 || info_servo > 100) // setting input limit
-                            Serial.print("Out of limit (max 100)\nGate Position (max 100): ") continue;
-
-                        // return the info variable for confirmation
-                        return_text = "info_servo variable string is: " + info_servo;
-                        Serial.println(return_text);
-
-                        // rotate servo to desired position
-                        if (info.toInt() < gate_servoPos)
-                        {
-                            for (0; gate_servoPos > info.toInt(); gate_servoPos -= 1)
-                            {
-                                gate_servo.write(gate_servoPos);
-                                delay(5);
-                            }
-                        }
-                        else if (info.toInt() > lid_servoPos)
-                        {
-                            for (0; gate_servoPos < info.toInt(); gate_servoPos += 1)
-                            {
-                                gate_servo.write(gate_servoPos);
-                                delay(5);
-                            }
-                        }
-                        else
-                        {
-                            delay(5);
-                        }
-                        break;
-                    }
-                }
-
-                delay(2500); // stop for 2.5 sec
-
-                // rotate back to Home Position
-                if (gate_init_pos < gate_servoPos)
-                {
-                    for (0; gate_servoPos > gate_init_pos; gate_servoPos -= 1)
-                    {
-                        gate_servo.write(gate_servoPos);
-                        delay(5);
-                    }
-                }
-                else if (gate_init_pos > lid_servoPos)
-                {
-                    for (0; gate_servoPos < gate_init_pos; gate_servoPos += 1)
-                    {
-                        gate_servo.write(gate_servoPos);
-                        delay(5);
-                    }
-                }
-
-                Serial.println("Check Done");
+              delay(5);
             }
+            break;
+          }
+        }
 
-        
-            else if (data == "exit" || data == "Exit" || data == "EXIT")
+        delay(2500); // stop for 2.5 sec
+
+        // rotate back to Home Position
+        if (lid_init_pos < lid_servoPos)
+        {
+          for (0; lid_servoPos > lid_init_pos; lid_servoPos -= 1)
+          {
+            gate_servo.write(lid_servoPos);
+            delay(5);
+          }
+        }
+        else if (lid_init_pos > lid_servoPos)
+        {
+          for (0; lid_servoPos < lid_init_pos; lid_servoPos += 1)
+          {
+            lid_servo.write(lid_servoPos);
+            delay(5);
+          }
+        }
+
+        Serial.println("Check Done");
+      }
+
+      else if (data == "GATE")
+      {
+        // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
+        Serial.print("Initiating GATE servo Test...\nGate Position (max 100): ");
+
+        gate_servo.write(gate_init_pos); // Home Position
+        int gate_servoPos;               // Current Position
+        gate_servoPos = gate_init_pos;
+
+        while (true)
+        {
+          delay(15);
+
+          // code for rotating Gate servo
+          if (Serial.available() > 0)
+          {
+            String info_servo;
+            info_servo = "";
+            String return_text;
+            info_servo = Serial.readStringUntil('\n'); // read input integer
+
+            if (info_servo.toInt() < 0 || info_servo.toInt() > 100) // setting input limit
+            { 
+              Serial.print("Out of limit (max 100)\nGate Position (max 100): ");
+              continue;
+            }
+            
+
+            // return the info variable for confirmation
+            return_text = "info_servo variable string is: " + info_servo;
+            Serial.println(return_text);
+
+            // rotate servo to desired position
+            if (info_servo.toInt() < gate_servoPos)
             {
-                Serial.println("Exit Testing Mode");
-                break;
+              for (0; gate_servoPos > info_servo.toInt(); gate_servoPos -= 1)
+              {
+                gate_servo.write(gate_servoPos);
+                delay(5);
+              }
+            }
+            else if (info_servo.toInt() > gate_servoPos)
+            {
+              for (0; gate_servoPos < info_servo.toInt(); gate_servoPos += 1)
+              {
+                gate_servo.write(gate_servoPos);
+                delay(5);
+              }
             }
             else
             {
-                Serial.print("Invalid Test Command. Enter again: ");
-                TestLoop(); // Restart TestLoop
+              delay(5);
             }
-        }
-        if (timeout_counter > 1000) // Exit testing mode after receving no input for 10 seconds
-        {
-            Serial.println("Exit Testing Mode (TIMEOUT)");
             break;
+          }
         }
+
+        delay(2500); // stop for 2.5 sec
+
+        // rotate back to Home Position
+        if (gate_init_pos < gate_servoPos)
+        {
+          for (0; gate_servoPos > gate_init_pos; gate_servoPos -= 1)
+          {
+            gate_servo.write(gate_servoPos);
+            delay(5);
+          }
+        }
+        else if (gate_init_pos > gate_servoPos)
+        {
+          for (0; gate_servoPos < gate_init_pos; gate_servoPos += 1)
+          {
+            gate_servo.write(gate_servoPos);
+            delay(5);
+          }
+        }
+
+        Serial.println("Check Done");
+      }
+
+      else if (data == "exit" || data == "Exit" || data == "EXIT")
+      {
+        Serial.println("Exit Testing Mode");
+        break;
+      }
+      else
+      {
+        Serial.print("Invalid Test Command. Enter again: ");
+        TestLoop(); // Restart TestLoop
+      }
     }
+    if (timeout_counter > 1000) // Exit testing mode after receving no input for 10 seconds
+    {
+      Serial.println("Exit Testing Mode (TIMEOUT)");
+      break;
+    }
+  }
