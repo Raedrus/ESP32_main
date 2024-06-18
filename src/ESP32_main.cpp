@@ -278,7 +278,7 @@ void TestLoop()
                 TestLoop(); // Go back to start of TestLoop
             }
 
-            else if (data == "GLED_ON"){
+            else if (data == "GLED"){
                 // code for turning on Green LED for 5 sec
                 Serial.println("Initiating Green LED Test...");
                 digitalWrite(GREENLED_PIN, HIGH);
@@ -289,7 +289,7 @@ void TestLoop()
                 TestLoop(); // Go back to start of TestLoop
             }
 
-            else if (data == "RLED_ON"){
+            else if (data == "RLED"){
                 // code for turning on Red LED for 5 sec
                 Serial.println("Initiating Red LED Test...");
                 digitalWrite(REDLED_PIN, HIGH);
