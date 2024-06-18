@@ -40,6 +40,7 @@ volatile bool intflag = false;
 unsigned long lastDebounceTime = 0;
 
 // // Function declarations
+void TestLoop();
 // void IRAM_ATTR EstopInterrupt();
 // void IRAM_ATTR stallInterrupt();
 // void gripperOpen();
@@ -167,55 +168,55 @@ void loop()
 
     if (data == "EMAGNET_ON") // Turn on electromagnet cluster
     {
-      digitalWrite(EMAGNET_PIN, HIGH); 
+      digitalWrite(EMAGNET_PIN, HIGH);
     }
     else if (data == "EMAGNET_OFF") // Turn off electromagnet cluster
     {
-      digitalWrite(EMAGNET_PIN, LOW); 
+      digitalWrite(EMAGNET_PIN, LOW);
     }
-    else if (data == "LIGHTS_ON")  // Turn on LED strip
+    else if (data == "LIGHTS_ON") // Turn on LED strip
     {
-      digitalWrite(LEDSTRIP_PIN, HIGH); 
+      digitalWrite(LEDSTRIP_PIN, HIGH);
     }
-    else if (data == "LIGHTS_OFF")  // Turn off LED strip
+    else if (data == "LIGHTS_OFF") // Turn off LED strip
     {
-      digitalWrite(LEDSTRIP_PIN, LOW); 
+      digitalWrite(LEDSTRIP_PIN, LOW);
     }
-    else if (data == "LID_OPEN")  //Open the input lid
+    else if (data == "LID_OPEN") // Open the input lid
     {
-      lid_servo.write(90);  //Position can be adjusted as desired
+      lid_servo.write(90); // Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "LID_CLOSE") //Close the input lid
+    else if (data == "LID_CLOSE") // Close the input lid
     {
-      lid_servo.write(90);  //Position can be adjusted as desired
+      lid_servo.write(90); // Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "GATE_OPEN") //Open the gate
+    else if (data == "GATE_OPEN") // Open the gate
     {
-      gate_servo.write(90);  //Position can be adjusted as desired
+      gate_servo.write(90); // Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "GATE_CLOSE")  //Close the gate
+    else if (data == "GATE_CLOSE") // Close the gate
     {
-      gate_servo.write(90);  //Position can be adjusted as desired
+      gate_servo.write(90); // Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "G_OPEN")  // Open gripper
+    else if (data == "G_OPEN") // Open gripper
     {
-      gripperOpen(); 
+      gripperOpen();
       Serial.println("Done");
     }
     else if (data == "G_CLOSE") // Close gripper
     {
-      gripperClose(); 
+      gripperClose();
       Serial.println("Done");
     }
     else if (data == "GLED_ON") // Turn on Green LED
     {
       digitalWrite(GREENLED_PIN, HIGH);
     }
-    else if (data == "GLED_OFF")  // Turn off Green LED
+    else if (data == "GLED_OFF") // Turn off Green LED
     {
       digitalWrite(GREENLED_PIN, LOW);
     }
@@ -223,35 +224,60 @@ void loop()
     {
       digitalWrite(REDLED_PIN, HIGH);
     }
-    else if (data == "RLED_OFF")  // Turn off Red LED
+    else if (data == "RLED_OFF") // Turn off Red LED
     {
       digitalWrite(REDLED_PIN, LOW);
     }
 
-
     if (data == "Test")
     {
-      int timeout_counter = 0;
-      Serial.println("Testing Mode");
-      while (true)
-      {
-        delay(0.01);
-        if (Serial.available() > 0){
-          break;
-        }
-        timeout_counter ++;
-        if (timeout_counter > 100)
-        {
-          Serial.println("Exit Testing Mode (TIMEOUT)");
-          break;
-        }
-      }
+      Serial.print("Testing Mode. Input test command or exit: ");
+      TestLoop();
+    }
+    else
+    {
+      Serial.println("Invalid input");
+    }
+  }
+}
 
+void TestLoop()
+{
+  int timeout_counter = 0;
+
+  while (true)
+  {
+    delay(10); // Delay 10ms
+    timeout_counter++;
+    if (Serial.available() > 0)
+    {
+      String data = Serial.readStringUntil('\n'); // Read test command
       if (data == "LED")
       {
-
+        // code for checking LED
+        Serial.println("Check Done");
+        Serial.print("Input test command or exit: ");
+        TestLoop(); // Go back to start of TestLoop
       }
-      
+      else if (data == "")
+      {
+        
+      }
+      else if (data == "exit" || data == "Exit" || data == "EXIT")
+      {
+        Serial.println("Exit Testing Mode");
+        break;
+      }
+      else
+      {
+        Serial.print("Invalid Test Command. Enter again: ");
+        TestLoop(); // Restart TestLoop
+      }
+    }
+    if (timeout_counter > 1000) // Exit testing mode after receving no input for 10 seconds
+    {
+      Serial.println("Exit Testing Mode (TIMEOUT)");
+      break;
     }
   }
 }
