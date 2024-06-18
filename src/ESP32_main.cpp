@@ -21,7 +21,6 @@
 #define STALL_VALUE 100     // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
 #define RA_SENSE 0.11f      // Sense resistor value, match to your driverA
 TMC2209Stepper driver(&Serial2, RA_SENSE, driver_ADDRESS);
-constexpr uint32_t steps_per_round = 3000 * (60 / 16); // Calculation for steps per round required.
 AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
 bool startup = true; // set false after homing
 bool stalled = false;
@@ -39,7 +38,7 @@ int gate_init_pos = 0;
 volatile bool intflag = false;
 unsigned long lastDebounceTime = 0;
 
-// // Function declarations
+// Function declarations
 void TestLoop();
 // void IRAM_ATTR EstopInterrupt();
 // void IRAM_ATTR stallInterrupt();
@@ -59,50 +58,47 @@ void IRAM_ATTR stallInterrupt()
   stalled = true; // Stall flag set when stepper motor stalls
 }
 
+// TMC2209 Reset
+void resetDriver()
+{
+  stalled = false;
+
+  // Disable the driver
+  driver.toff(0);
+  delay(10); // Small delay to ensure the driver is properly disabled
+
+  // Reinitialize the driver settings
+  driver.toff(5); // Enable driver
+  TMC2209settings();
+}
+
 // Function to open the gripper
 void gripperOpen()
 {
-  stepper.move(-100 * steps_per_round); // Move 100mm
+  resetDriver();
+  stepper.setSpeed(-1000);
   while (!stalled)
   {
-    stepper.run();
+    stepper.runSpeed();
   }
+  stepper.stop();
   stepper.setCurrentPosition(0); // Set current position as home
-  stalled = false;
 }
 
 // Function to close the gripper
 void gripperClose()
 {
-  stepper.move(100 * steps_per_round); // Move 100mm
+  resetDriver();
+  stepper.setSpeed(1000);
   while (!stalled)
   {
-    stepper.run();
+    stepper.runSpeed();
   }
+  stepper.stop();
   stepper.setCurrentPosition(0); // Set current position as home
-  stalled = false;
 }
 
-// Function to open the input lid
-void lidOpen()
-{
-}
-
-// Function to close the input lid
-void lidClose()
-{
-}
-
-// Function to open the gate
-void gateOpen()
-{
-}
-
-// Function to close the gate
-void gateClose()
-{
-}
-
+// Setup
 void setup()
 {
   // Initiate serial comms with Pi 5
@@ -127,18 +123,7 @@ void setup()
   // Enable interrupt for motor stall
   attachInterrupt(digitalPinToInterrupt(STALL_PIN), stallInterrupt, RISING);
 
-  driver.begin();          // Initiate pins and registeries
-  driver.rms_current(400); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
-  driver.pwm_autograd(1);  // Enable automatic gradient adaptation
-  driver.pwm_autoscale(1);
-  driver.microsteps(16);
-  driver.TCOOLTHRS(0xFFFFF); // 20bit max
-  driver.SGTHRS(STALL_VALUE);
-
-  stepper.setMaxSpeed(1.25 * steps_per_round);   // 100mm/s @ 80 steps/mm
-  stepper.setAcceleration(10 * steps_per_round); // 2000mm/s^2
-  stepper.setPinsInverted(false, false, true);
-  stepper.enableOutputs();
+  TMC2209settings(); // Initialize TMC2209 Stepper Driver
 
   gripperOpen(); // Open the gripper
 
@@ -159,6 +144,21 @@ void setup()
   // for an accurate 0 to 180 sweep
 }
 
+void TMC2209settings()
+{
+  driver.begin();          // Initiate pins and registeries
+  driver.rms_current(400); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+  driver.pwm_autograd(1);  // Enable automatic gradient adaptation
+  driver.pwm_autoscale(1);
+  driver.microsteps(16);
+  driver.TCOOLTHRS(0xFFFFF); // 20bit max
+  driver.SGTHRS(STALL_VALUE);
+
+  stepper.setMaxSpeed(1000);
+  stepper.setAcceleration(500); // 2000mm/s^2
+  stepper.setPinsInverted(false, false, true);
+  stepper.enableOutputs();
+}
 void loop()
 {
   if (Serial.available() > 0)
@@ -261,7 +261,6 @@ void TestLoop()
       }
       else if (data == "")
       {
-        
       }
       else if (data == "exit" || data == "Exit" || data == "EXIT")
       {
