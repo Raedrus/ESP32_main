@@ -247,8 +247,9 @@ void TestLoop()
   
   while (true)
   {
+    
     delay(10); // Delay 10ms
-    timeout_counter++;
+    
     if (Serial.available() > 0)
     {
       String data = Serial.readStringUntil('\n'); // Read test command
@@ -366,7 +367,7 @@ void TestLoop()
         {
           for (0; lid_servoPos > lid_init_pos; lid_servoPos -= 1)
           {
-            gate_servo.write(lid_servoPos);
+            lid_servo.write(lid_servoPos);
             delay(5);
           }
         }
@@ -473,9 +474,6 @@ void TestLoop()
         TestLoop(); // Restart TestLoop
       }
     }
-    if (timeout_counter > 1000) // Exit testing mode after receving no input for 10 seconds
-    {
-      Serial.println("Exit Testing Mode (TIMEOUT)");
-      break;
-    }
+
   }
+}
