@@ -9,8 +9,8 @@
 #define EMAGNET_PIN 4
 #define SERVO_PIN 26
 #define LEDSTRIP_PIN 15
-#define GREENLED_PIN 36
-#define REDLED_PIN 39
+#define GREENLED_PIN 18
+#define REDLED_PIN 5
 #define STARTBUTTON_PIN 2
 
 // TMC2209 stepper driver initiation
