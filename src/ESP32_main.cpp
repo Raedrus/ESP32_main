@@ -30,7 +30,7 @@ Servo lid_servo;
 Servo gate_servo;
 int lid_init_pos = 0;
 int gate_init_pos = 0;
-#define LID_SERVO_PIN 18
+#define LID_SERVO_PIN 26
 #define GATE_SERVO_PIN 25
 
 // Button debouncing variables
