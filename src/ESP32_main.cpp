@@ -305,7 +305,7 @@ void TestLoop()
       else if (data == "LID")
       {
         // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
-        Serial.print("Initiating LID servo Test...\nLid Position (max 100): ");
+        Serial.print("Initiating LID servo Test...");
 
         lid_servo.write(lid_init_pos); // Home Position
         int lid_servoPos;              // Current Position
@@ -325,7 +325,7 @@ void TestLoop()
 
             if (info_servo.toInt() < 0 || info_servo.toInt() > 100) // setting input limit
             {
-              Serial.print("Out of limit (max 100)\nLid Position (max 100): ");
+              Serial.print("Out of limit (max 100)");
               continue;
             }
 
@@ -388,7 +388,7 @@ void TestLoop()
       else if (data == "GATE")
       {
         // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
-        Serial.print("Initiating GATE servo Test...\nGate Position (max 100): ");
+        Serial.print("Initiating GATE servo Test...");
 
         gate_servo.write(gate_init_pos); // Home Position
         int gate_servoPos;               // Current Position
@@ -408,7 +408,7 @@ void TestLoop()
 
             if (info_servo.toInt() < 0 || info_servo.toInt() > 100) // setting input limit
             { 
-              Serial.print("Out of limit (max 100)\nGate Position (max 100): ");
+              Serial.print("Out of limit (max 100)");
               continue;
             }
             
