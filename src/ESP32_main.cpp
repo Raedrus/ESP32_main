@@ -355,6 +355,8 @@ void TestLoop()
             else
             {
               delay(5);
+              Serial.println("Invalid, try again");
+              continue;
             }
             break;
           }
