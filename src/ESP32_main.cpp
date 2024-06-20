@@ -9,8 +9,8 @@
 #define EMAGNET_PIN 4
 #define SERVO_PIN 26
 #define LEDSTRIP_PIN 15
-#define GREENLED_PIN 18
-#define REDLED_PIN 5
+#define GREENLED_PIN 34
+#define REDLED_PIN 35
 #define STARTBUTTON_PIN 2
 
 // TMC2209 stepper driver initiation
@@ -30,7 +30,7 @@ Servo lid_servo;
 Servo gate_servo;
 int lid_init_pos = 0;
 int gate_init_pos = 0;
-#define LID_SERVO_PIN 26
+#define LID_SERVO_PIN 18
 #define GATE_SERVO_PIN 25
 
 // Button debouncing variables
