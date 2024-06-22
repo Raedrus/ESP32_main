@@ -40,6 +40,7 @@ unsigned long lastDebounceTime = 0;
 
 // Function declarations
 void TestLoop();
+void TMC2209settings();
 // void IRAM_ATTR EstopInterrupt();
 // void IRAM_ATTR stallInterrupt();
 // void gripperOpen();
