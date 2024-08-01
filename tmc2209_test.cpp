@@ -8,12 +8,14 @@
 #define STEP_PIN 22         // Step
 #define STALL_PIN 21        // Connected to DIAG pin on the TMC2209
 #define driver_ADDRESS 0b00 // Pins MS1 and MS2 connected to GND.
-#define STALL_VALUE 80 // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
+#define STALL_VALUE 3 // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
 #define RA_SENSE 0.11f      // Sense resistor value, match to your driverA
 TMC2209Stepper driver(&Serial2, RA_SENSE, driver_ADDRESS);
 AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
 bool startup = true; // set false after homing
 bool stalled = false;
+
+
 
 void TMC2209settings();
 
@@ -40,14 +42,14 @@ void resetDriver()
 void TMC2209settings()
 {
   driver.begin();          // Initiate pins and registeries
-  driver.rms_current(350); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+  driver.rms_current(300); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
   driver.pwm_autograd(1);  // Enable automatic gradient adaptation
   driver.pwm_autoscale(1);
-  driver.microsteps(16);
+  driver.microsteps(32);
   driver.TCOOLTHRS(0xFFFFF); // 20bit max
   driver.SGTHRS(STALL_VALUE);
 
-  stepper.setMaxSpeed(5000);
+  stepper.setMaxSpeed(10000);
   stepper.setAcceleration(2000); // 2000mm/s^2
   stepper.setPinsInverted(false, false, true);
   stepper.enableOutputs();
@@ -89,6 +91,8 @@ void setup()
   // Initiate serial comms with TMC2209 stepper driver
   Serial2.begin(115200);
 
+  pinMode(DIR_PIN,OUTPUT);
+  pinMode(STEP_PIN,OUTPUT);
   // Enable interrupt for motor stall
   attachInterrupt(digitalPinToInterrupt(STALL_PIN), stallInterrupt, RISING);
 
@@ -108,10 +112,14 @@ void loop() {
     Serial.println(input);
     if (input == "open") {
       Serial.println("Opening gripper...");
+      Serial.println("Value of SG_RESULT");
+      Serial.println(driver.SG_RESULT());
       gripperOpen();
       Serial.println("Gripper opened.");
     } else if (input == "close") {
       Serial.println("Closing gripper...");
+      Serial.println("Value of SG_RESULT");
+      Serial.println(driver.SG_RESULT());
       gripperClose();
       Serial.println("Gripper closed.");
     } else {
