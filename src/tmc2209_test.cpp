@@ -9,8 +9,12 @@
 #define STALL_PIN 18        // Connected to DIAG pin on the TMC2209
 #define EN_PIN 5
 #define driver_ADDRESS 0b00 // Pins MS1 and MS2 connected to GND.
+<<<<<<< HEAD:src/tmc2209_test.cpp
 #define STALL_VALUE 58
 // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
+=======
+#define STALL_VALUE 3 // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
+>>>>>>> a74aea64580745815c883f54718ad9d983d47040:tmc2209_test.cpp
 #define RA_SENSE 0.11f      // Sense resistor value, match to your driverA
 TMC2209Stepper driver(&Serial2, RA_SENSE, driver_ADDRESS);
 AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
@@ -44,10 +48,17 @@ void resetDriver()
 void TMC2209settings()
 {
   driver.begin();          // Initiate pins and registeries
+<<<<<<< HEAD:src/tmc2209_test.cpp
   driver.rms_current(1800); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
   driver.pwm_autograd(1);  // Enable automatic gradient adaptation
   // driver.pwm_autoscale(1);
   driver.microsteps(4);
+=======
+  driver.rms_current(300); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+  driver.pwm_autograd(1);  // Enable automatic gradient adaptation
+  driver.pwm_autoscale(1);
+  driver.microsteps(32);
+>>>>>>> a74aea64580745815c883f54718ad9d983d47040:tmc2209_test.cpp
   driver.TCOOLTHRS(0xFFFFF); // 20bit max
   driver.SGTHRS(STALL_VALUE);
   
@@ -108,12 +119,17 @@ void setup()
   // Initiate serial comms with TMC2209 stepper driver
   Serial2.begin(115200);
 
+<<<<<<< HEAD:src/tmc2209_test.cpp
   driver.pdn_disable(1);
   driver.ihold(5);
 
   pinMode(DIR_PIN,OUTPUT);
   pinMode(STEP_PIN,OUTPUT);
   pinMode(EN_PIN,OUTPUT);
+=======
+  pinMode(DIR_PIN,OUTPUT);
+  pinMode(STEP_PIN,OUTPUT);
+>>>>>>> a74aea64580745815c883f54718ad9d983d47040:tmc2209_test.cpp
   // Enable interrupt for motor stall
   attachInterrupt(digitalPinToInterrupt(STALL_PIN), stallInterrupt, RISING);
 
