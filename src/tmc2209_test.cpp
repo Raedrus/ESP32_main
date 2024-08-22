@@ -48,17 +48,10 @@ void resetDriver()
 void TMC2209settings()
 {
   driver.begin();          // Initiate pins and registeries
-<<<<<<< HEAD:src/tmc2209_test.cpp
   driver.rms_current(1800); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
   driver.pwm_autograd(1);  // Enable automatic gradient adaptation
   // driver.pwm_autoscale(1);
   driver.microsteps(4);
-=======
-  driver.rms_current(300); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
-  driver.pwm_autograd(1);  // Enable automatic gradient adaptation
-  driver.pwm_autoscale(1);
-  driver.microsteps(32);
->>>>>>> a74aea64580745815c883f54718ad9d983d47040:tmc2209_test.cpp
   driver.TCOOLTHRS(0xFFFFF); // 20bit max
   driver.SGTHRS(STALL_VALUE);
   
