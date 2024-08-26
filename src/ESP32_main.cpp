@@ -4,9 +4,9 @@
 #include <AccelStepper.h>
 #include <esp_system.h>
 
-#define ESTOP_PIN 27
+#define ESTOP_PIN 13
 #define LED_PIN 2
-#define EMAGNET_PIN 4
+#define EMAGNET_PIN 27
 #define SERVO_PIN 26
 #define LEDSTRIP_PIN 15
 #define GREENLED_PIN 34
@@ -14,9 +14,9 @@
 #define STARTBUTTON_PIN 2
 
 // TMC2209 stepper driver initiation
-#define DIR_PIN 13          // Direction
-#define STEP_PIN 12         // Step
-#define STALL_PIN 11        // Connected to DIAG pin on the TMC2209
+#define DIR_PIN 2          // Direction
+#define STEP_PIN 4         // Step
+#define STALL_PIN 5        // Connected to DIAG pin on the TMC2209
 #define driver_ADDRESS 0b00 // Pins MS1 and MS2 connected to GND.
 #define STALL_VALUE 100     // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
 #define RA_SENSE 0.11f      // Sense resistor value, match to your driverA
@@ -162,6 +162,18 @@ void TMC2209settings()
 }
 void loop()
 {
+  while (1)
+  {
+    /* code */
+    Serial.println("Initiating MAGNET Test...");
+    digitalWrite(EMAGNET_PIN, HIGH);
+    delay(10000); // Delay for 10 sec
+    Serial.println("Off MAGNET Test...");
+    digitalWrite(EMAGNET_PIN, LOW);
+    Serial.println("Check Done");
+  }
+  
+  
   if (Serial.available() > 0)
   {                                             // Check presence of data at serial port
     String data = Serial.readStringUntil('\n'); // Read command from Pi
