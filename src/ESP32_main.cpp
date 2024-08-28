@@ -7,10 +7,9 @@
 #define ESTOP_PIN 13
 #define LED_PIN 2
 #define EMAGNET_PIN 27
-#define SERVO_PIN 26
 #define LEDSTRIP_PIN 15
-#define GREENLED_PIN 34
-#define REDLED_PIN 35
+#define GREENLED_PIN 25
+#define REDLED_PIN 26
 #define STARTBUTTON_PIN 2
 
 // TMC2209 stepper driver initiation
@@ -28,10 +27,11 @@ bool stalled = false;
 // Servo initiation
 Servo lid_servo;
 Servo gate_servo;
-int lid_init_pos = 0;
-int gate_init_pos = 0;
-#define LID_SERVO_PIN 26
-#define GATE_SERVO_PIN 25
+int lid_init_pos = 90;
+int gate_init_pos = 100;
+int gate_open_pos = 23;
+#define LID_SERVO_PIN 12
+#define GATE_SERVO_PIN 13
 
 // Button debouncing variables
 #define DEBOUNCE_TIME 40
@@ -110,7 +110,6 @@ void setup()
   pinMode(ESTOP_PIN, INPUT_PULLUP);
   pinMode(STARTBUTTON_PIN, INPUT_PULLUP);
   pinMode(EMAGNET_PIN, OUTPUT);
-  pinMode(SERVO_PIN, OUTPUT);
   pinMode(LEDSTRIP_PIN, OUTPUT);
   pinMode(GREENLED_PIN, OUTPUT);
   pinMode(REDLED_PIN, OUTPUT);
@@ -162,18 +161,7 @@ void TMC2209settings()
 }
 void loop()
 {
-  while (1)
-  {
-    /* code */
-    Serial.println("Initiating MAGNET Test...");
-    digitalWrite(EMAGNET_PIN, HIGH);
-    delay(10000); // Delay for 10 sec
-    Serial.println("Off MAGNET Test...");
-    digitalWrite(EMAGNET_PIN, LOW);
-    Serial.println("Check Done");
-  }
-  
-  
+
   if (Serial.available() > 0)
   {                                             // Check presence of data at serial port
     String data = Serial.readStringUntil('\n'); // Read command from Pi
@@ -242,7 +230,7 @@ void loop()
       digitalWrite(REDLED_PIN, LOW);
     }
 
-    if (data == "Test")
+    if (data=="Test")
     {
       Serial.print("Testing Mode. Input test command or exit: ");
       TestLoop();
