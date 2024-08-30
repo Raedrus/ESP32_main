@@ -4,13 +4,13 @@
 #include <AccelStepper.h>
 #include <esp_system.h>
 
-#define ESTOP_PIN 13
-#define LED_PIN 2
+#define ESTOP_PIN 32
 #define EMAGNET_PIN 27
-#define LEDSTRIP_PIN 15
+#define LEDSTRIP_PIN 14
 #define GREENLED_PIN 25
 #define REDLED_PIN 26
-#define STARTBUTTON_PIN 2
+#define LID_LIMIT_PIN 33
+
 
 // TMC2209 stepper driver initiation
 #define DIR_PIN 2          // Direction
@@ -106,9 +106,8 @@ void setup()
   Serial.begin(115200);
 
   // Initiate mode of IO pins
-  pinMode(LED_PIN, OUTPUT);
   pinMode(ESTOP_PIN, INPUT_PULLUP);
-  pinMode(STARTBUTTON_PIN, INPUT_PULLUP);
+  pinMode(LID_LIMIT_PIN, INPUT_PULLUP);
   pinMode(EMAGNET_PIN, OUTPUT);
   pinMode(LEDSTRIP_PIN, OUTPUT);
   pinMode(GREENLED_PIN, OUTPUT);
@@ -195,12 +194,12 @@ void loop()
     }
     else if (data == "GATE_OPEN") // Open the gate
     {
-      gate_servo.write(90); // Position can be adjusted as desired
+      gate_servo.write(gate_open_pos); // Position can be adjusted as desired
       Serial.println("Done");
     }
     else if (data == "GATE_CLOSE") // Close the gate
     {
-      gate_servo.write(90); // Position can be adjusted as desired
+      gate_servo.write(gate_init_pos); // Position can be adjusted as desired
       Serial.println("Done");
     }
     else if (data == "G_OPEN") // Open gripper
