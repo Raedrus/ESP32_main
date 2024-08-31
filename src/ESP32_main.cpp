@@ -9,7 +9,7 @@
 #define LEDSTRIP_PIN 14
 #define GREENLED_PIN 25
 #define REDLED_PIN 26
-#define LID_LIMIT_PIN 33
+#define LID_LIMIT_PIN 15
 
 
 // TMC2209 stepper driver initiation
