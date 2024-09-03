@@ -304,62 +304,17 @@ void TestLoop()
 
       else if (data == "LID")
       {
-        // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
-        Serial.print("Initiating LID servo Test...");
+        Serial.print("Initiating LID servo Test...\nStarted");
 
-        lid_servo.write(lid_init_pos); // Home Position
-        int lid_servoPos;              // Current Position
-        lid_servoPos = lid_init_pos;
+        lid_servo.write(70); 
+        delay(1500);
+        Serial.print("Reverse");
+        lid_servo.write(110);
+        delay(1500);
+        
+        liid_servo.write(90);
 
-        while (true)
-        {
-          delay(15);
-
-          // code for rotating LID servo
-          if (Serial.available() > 0)
-          {
-            String info_servo;
-            info_servo = "";
-            String return_text;
-            info_servo = Serial.readStringUntil('\n'); // read input integer
-
-            if (info_servo.toInt() < 0 || info_servo.toInt() > 100) // setting input limit
-            {
-              Serial.print("Out of limit (max 100)");
-              continue;
-            }
-
-
-            // return the info variable for confirmation
-            return_text = "info_servo variable string is: " + info_servo;
-            Serial.println(return_text);
-
-            // rotate servo to desired position
-            if (info_servo.toInt() < lid_servoPos)
-            {
-              for (0; lid_servoPos > info_servo.toInt(); lid_servoPos -= 1)
-              {
-                lid_servo.write(lid_servoPos);
-                delay(5);
-              }
-            }
-            else if (info_servo.toInt() > lid_servoPos)
-            {
-              for (0; lid_servoPos < info_servo.toInt(); lid_servoPos += 1)
-              {
-                lid_servo.write(lid_servoPos);
-                delay(5);
-              }
-            }
-
-            else
-            {
-              delay(5);
-              Serial.println("Invalid, try again");
-              continue;
-            }
-            break;
-          }
+        Serial.print("DONE");
         }
 
         delay(2500); // stop for 2.5 sec
