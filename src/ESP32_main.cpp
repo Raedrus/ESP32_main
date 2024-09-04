@@ -198,11 +198,11 @@ void loop()
       gate_servo.write(gate_open_pos); // Position can be adjusted as desired
       Serial.println("Done");
     }
-    else if (data == "VAC_ON")
+    else if (data == "VAC_ON")  //  Turn on vacuum pump
     {
       digitalWrite(VAC_MOTOR_PIN,HIGH);
     }
-    else if (data =="VAC_OFF")
+    else if (data =="VAC_OFF")  // Turn off vacuum pump
     {
       digitalWrite(VAC_MOTOR_PIN,LOW);
     }
@@ -321,7 +321,7 @@ void TestLoop()
         lid_servo.write(110);
         delay(1500);
         
-        liid_servo.write(90);
+        lid_servo.write(90);
 
         Serial.print("DONE");
         }
