@@ -10,7 +10,7 @@
 #define GREENLED_PIN 25
 #define REDLED_PIN 26
 #define LID_LIMIT_PIN 15
-
+#define VAC_MOTOR_PIN 33
 
 // TMC2209 stepper driver initiation
 #define DIR_PIN 2          // Direction
@@ -112,6 +112,7 @@ void setup()
   pinMode(LEDSTRIP_PIN, OUTPUT);
   pinMode(GREENLED_PIN, OUTPUT);
   pinMode(REDLED_PIN, OUTPUT);
+  pinMode(VAC_MOTOR_PIN, OUTPUT);
 
   // Enable interrupt for EStop Button
   attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, RISING);
@@ -196,6 +197,14 @@ void loop()
     {
       gate_servo.write(gate_open_pos); // Position can be adjusted as desired
       Serial.println("Done");
+    }
+    else if (data == "VAC_ON")
+    {
+      digitalWrite(VAC_MOTOR_PIN,HIGH);
+    }
+    else if (data =="VAC_OFF")
+    {
+      digitalWrite(VAC_MOTOR_PIN,LOW);
     }
     else if (data == "GATE_CLOSE") // Close the gate
     {
