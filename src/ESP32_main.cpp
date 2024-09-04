@@ -326,29 +326,6 @@ void TestLoop()
         Serial.print("DONE");
         }
 
-        delay(2500); // stop for 2.5 sec
-
-        // rotate back to Home Position
-        if (lid_init_pos < lid_servoPos)
-        {
-          for (0; lid_servoPos > lid_init_pos; lid_servoPos -= 1)
-          {
-            lid_servo.write(lid_servoPos);
-            delay(5);
-          }
-        }
-        else if (lid_init_pos > lid_servoPos)
-        {
-          for (0; lid_servoPos < lid_init_pos; lid_servoPos += 1)
-          {
-            lid_servo.write(lid_servoPos);
-            delay(5);
-          }
-        }
-
-        Serial.println("Check Done");
-      }
-
       else if (data == "GATE")
       {
         // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
@@ -440,6 +417,8 @@ void TestLoop()
         TestLoop(); // Restart TestLoop
     }
   }
-
+  }
 }
+
+
 
