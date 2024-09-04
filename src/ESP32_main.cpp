@@ -185,12 +185,17 @@ void loop()
     }
     else if (data == "LID_OPEN") // Open the input lid
     {
-      lid_servo.write(90); // Position can be adjusted as desired
+      lid_servo.write(110); // Position can be adjusted as desired
+      while (digitalRead(LID_LIMIT_PIN) == HIGH){
+        delay(5);
+      }
+      lid_servo.write(90);
       Serial.println("Done");
     }
     else if (data == "LID_CLOSE") // Close the input lid
     {
-      lid_servo.write(90); // Position can be adjusted as desired
+      lid_servo.write(70); // Position can be adjusted as desired
+      delay(2000);
       Serial.println("Done");
     }
     else if (data == "GATE_OPEN") // Open the gate
