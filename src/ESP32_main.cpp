@@ -438,8 +438,8 @@ void TestLoop()
       {
         Serial.print("Invalid Test Command. Enter again: ");
         TestLoop(); // Restart TestLoop
-      }
     }
-
   }
+
 }
+
