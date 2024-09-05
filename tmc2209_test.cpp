@@ -66,9 +66,17 @@ void gripperOpen()
   resetDriver();
   stepper.enableOutputs();
   stepper.setSpeed(-500);
-  while (!stalled)
+  // while (!stalled)
+  // {
+  //   stepper.runSpeed();
+  // }
+    
+  int i = 0;
+  while (i<150)
   {
-    stepper.runSpeed();
+  stepper.runSpeed();
+  delay(5);
+  i++;
   }
   stepper.stop();
   stepper.setCurrentPosition(0); // Set current position as home
@@ -81,13 +89,13 @@ void gripperClose()
   resetDriver();
   stepper.enableOutputs();
   stepper.setSpeed(500);
-  while (!stalled)
-  {
-    stepper.runSpeed();
-  }
+  // while (!stalled)
+  // {
+  //   stepper.runSpeed();
+  // }
   
   int i = 0;
-  while (i<15)
+  while (i<150)
   {
   stepper.runSpeed();
   delay(5);
