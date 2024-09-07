@@ -10,7 +10,7 @@
 #define GREENLED_PIN 25
 #define REDLED_PIN 26
 #define LID_LIMIT_PIN 15
-
+#define VAC_MOTOR_PIN 33
 
 // TMC2209 stepper driver initiation
 #define DIR_PIN 2          // Direction
@@ -147,7 +147,6 @@ void setup()
   pinMode(LEDSTRIP_PIN, OUTPUT);
   pinMode(GREENLED_PIN, OUTPUT);
   pinMode(REDLED_PIN, OUTPUT);
-  pinMode(EN_PIN, OUTPUT);
 
   // Enable interrupt for EStop Button
   // attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, RISING);
@@ -225,20 +224,11 @@ void loop()
     }
     else if (data == "LID_OPEN") // Open the input lid
     {
-      delay(10);
-      Serial.println("OPENING LID");
-      lid_servo.write(80); // Position can be adjusted as desired
-      while (digitalRead(LID_LIMIT_PIN) == LOW)
-      {
-          
-      }
-      lid_servo.write(90);
+      lid_servo.write(90); // Position can be adjusted as desired
       Serial.println("Done");
     }
     else if (data == "LID_CLOSE") // Close the input lid
     {
-      lid_servo.write(150);
-      delay(2000);
       lid_servo.write(90); // Position can be adjusted as desired
       Serial.println("Done");
     }
@@ -246,6 +236,14 @@ void loop()
     {
       gate_servo.write(gate_open_pos); // Position can be adjusted as desired
       Serial.println("Done");
+    }
+    else if (data == "VAC_ON")  //  Turn on vacuum pump
+    {
+      digitalWrite(VAC_MOTOR_PIN,HIGH);
+    }
+    else if (data =="VAC_OFF")  // Turn off vacuum pump
+    {
+      digitalWrite(VAC_MOTOR_PIN,LOW);
     }
     else if (data == "GATE_CLOSE") // Close the gate
     {
@@ -356,86 +354,18 @@ void TestLoop()
 
       else if (data == "LID")
       {
-        // Wait for servo position input, max limit 100!!! should be adjusted based on practical use
-        Serial.print("Initiating LID servo Test...");
+        Serial.print("Initiating LID servo Test...\nStarted");
 
-        lid_servo.write(lid_init_pos); // Home Position
-        int lid_servoPos;              // Current Position
-        lid_servoPos = lid_init_pos;
+        lid_servo.write(70); 
+        delay(1500);
+        Serial.print("Reverse");
+        lid_servo.write(110);
+        delay(1500);
+        
+        lid_servo.write(90);
 
-        while (true)
-        {
-          delay(15);
-
-          // code for rotating LID servo
-          if (Serial.available() > 0)
-          {
-            String info_servo;
-            info_servo = "";
-            String return_text;
-            info_servo = Serial.readStringUntil('\n'); // read input integer
-
-            if (info_servo.toInt() < 0 || info_servo.toInt() > 100) // setting input limit
-            {
-              Serial.print("Out of limit (max 100)");
-              continue;
-            }
-
-
-            // return the info variable for confirmation
-            return_text = "info_servo variable string is: " + info_servo;
-            Serial.println(return_text);
-
-            // rotate servo to desired position
-            if (info_servo.toInt() < lid_servoPos)
-            {
-              for (0; lid_servoPos > info_servo.toInt(); lid_servoPos -= 1)
-              {
-                lid_servo.write(lid_servoPos);
-                delay(5);
-              }
-            }
-            else if (info_servo.toInt() > lid_servoPos)
-            {
-              for (0; lid_servoPos < info_servo.toInt(); lid_servoPos += 1)
-              {
-                lid_servo.write(lid_servoPos);
-                delay(5);
-              }
-            }
-
-            else
-            {
-              delay(5);
-              Serial.println("Invalid, try again");
-              continue;
-            }
-            break;
-          }
+        Serial.print("DONE");
         }
-
-        delay(2500); // stop for 2.5 sec
-
-        // rotate back to Home Position
-        if (lid_init_pos < lid_servoPos)
-        {
-          for (0; lid_servoPos > lid_init_pos; lid_servoPos -= 1)
-          {
-            lid_servo.write(lid_servoPos);
-            delay(5);
-          }
-        }
-        else if (lid_init_pos > lid_servoPos)
-        {
-          for (0; lid_servoPos < lid_init_pos; lid_servoPos += 1)
-          {
-            lid_servo.write(lid_servoPos);
-            delay(5);
-          }
-        }
-
-        Serial.println("Check Done");
-      }
 
       else if (data == "GATE")
       {
@@ -526,8 +456,10 @@ void TestLoop()
       {
         Serial.print("Invalid Test Command. Enter again: ");
         TestLoop(); // Restart TestLoop
-      }
     }
-
+  }
   }
 }
+
+
+
