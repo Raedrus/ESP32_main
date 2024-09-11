@@ -18,7 +18,7 @@
 #define STALL_PIN 18        // Connected to DIAG pin on the TMC2209
 #define EN_PIN 5
 #define driver_ADDRESS 0b00 // Pins MS1 and MS2 connected to GND.
-#define STALL_VALUE 100     // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
+#define STALL_VALUE 150    // Stallguard values for each driver(0-255), higher number -> higher sensitivity.
 #define RA_SENSE 0.11f      // Sense resistor value, match to your driverA
 TMC2209Stepper driver(&Serial2, RA_SENSE, driver_ADDRESS);
 AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
@@ -85,7 +85,7 @@ void gripperOpen()
 {
   resetDriver();
   i=0;
-  stepper.setSpeed(4000);
+  stepper.setSpeed(1000000);
   
   Serial.print("open");
   while (i<2500)
@@ -97,22 +97,23 @@ void gripperOpen()
   stepper.stop();
   stepper.setCurrentPosition(0); // Set current position as home
 
-  // resetDriver();
+//   resetDriver();
   
-  // stepper.setSpeed(-1000);
-  // while (!stalled)
-  // {
-  //   stepper.runSpeed();
-  // }
-  // stepper.stop();
-  // stepper.setCurrentPosition(0); // Set current position as home
+//   stepper.setSpeed(500000);
+//   while (!stalled)
+//   {
+//     stepper.runSpeed();
+//     Serial.println(driver.SG_RESULT());
+//   }
+//   stepper.stop();
+//   stepper.setCurrentPosition(0); // Set current position as home
 }
 
 // Function to close the gripper
 void gripperClose()
 {
   resetDriver();
-  stepper.setSpeed(-4000);
+  stepper.setSpeed(-1000000);
   i=0;
   Serial.print("close");
   while (i<2500)
@@ -124,14 +125,15 @@ void gripperClose()
   stepper.stop();
   stepper.setCurrentPosition(0); // Set current position as home
 
-  // resetDriver();
-  // stepper.setSpeed(1000);
-  // while (!stalled)
-  // {
-  //   stepper.runSpeed();
-  // }
-  // stepper.stop();
-  // stepper.setCurrentPosition(0); // Set current position as home
+//   resetDriver();
+//   stepper.setSpeed(-500000);
+//   while (!stalled)
+//   {
+//     stepper.runSpeed();
+//     Serial.println(driver.SG_RESULT());
+//   }
+//   stepper.stop();
+//   stepper.setCurrentPosition(0); // Set current position as home
 }
 
 // Setup
@@ -147,7 +149,7 @@ void setup()
   pinMode(LEDSTRIP_PIN, OUTPUT);
   pinMode(GREENLED_PIN, OUTPUT);
   pinMode(REDLED_PIN, OUTPUT);
-
+  pinMode(EN_PIN,OUTPUT);
   // Enable interrupt for EStop Button
   // attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, RISING);
 
@@ -166,11 +168,11 @@ void setup()
   // ESP32PWM::allocateTimer(2);
   // ESP32PWM::allocateTimer(3);
   lid_servo.setPeriodHertz(50);               // Set period for servo
-  lid_servo.attach(LID_SERVO_PIN, 500, 2400); // Attaches the servo at pin 26 to its servo object
+  lid_servo.attach(LID_SERVO_PIN, 500, 2400); // Attaches the servo at pin 12 to its servo object
   lid_servo.write(lid_init_pos);              // Moves the servo to desired home position
 
   gate_servo.setPeriodHertz(50);                // Set period for servo
-  gate_servo.attach(GATE_SERVO_PIN, 500, 2400); // Attaches the servo pin 25 to its servo object
+  gate_servo.attach(GATE_SERVO_PIN, 500, 2400); // Attaches the servo pin 13 to its servo object
   gate_servo.write(gate_init_pos);              // Moves the servo to desired home position
   // using default min/max of 1000us and 2000us
   // different servos may require different min/max settings
@@ -181,15 +183,15 @@ void TMC2209settings()
 {
   digitalWrite(EN_PIN, LOW);
   driver.begin();          // Initiate pins and registeries
-  driver.rms_current(1500); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+  driver.rms_current(1800); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
   driver.pwm_autograd(1);  // Enable automatic gradient adaptation
   driver.pwm_autoscale(1);
-  driver.microsteps(16);
+  driver.microsteps(32);
   driver.TCOOLTHRS(0xFFFFF); // 20bit max
   driver.SGTHRS(STALL_VALUE);
 
-  stepper.setMaxSpeed(10000);
-  stepper.setAcceleration(3000); // 2000mm/s^2
+  stepper.setMaxSpeed(1000000);
+  stepper.setAcceleration(5000); // 2000mm/s^2
   stepper.setPinsInverted(false, false, true);
   stepper.enableOutputs();
   
@@ -224,12 +226,18 @@ void loop()
     }
     else if (data == "LID_OPEN") // Open the input lid
     {
-      lid_servo.write(90); // Position can be adjusted as desired
+      lid_servo.write(70); // Position can be adjusted as desired
+      while (digitalRead(LID_LIMIT_PIN) ==LOW){
+
+      }
+      lid_servo.write(90);
       Serial.println("Done");
     }
     else if (data == "LID_CLOSE") // Close the input lid
     {
-      lid_servo.write(90); // Position can be adjusted as desired
+      lid_servo.write(110); // Position can be adjusted as desired
+      delay(2000);
+      lid_servo.write(90);
       Serial.println("Done");
     }
     else if (data == "GATE_OPEN") // Open the gate
