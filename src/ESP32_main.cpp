@@ -208,21 +208,27 @@ void loop()
 
 
 
-    if (data == "EMAGNET_ON") // Turn on electromagnet cluster
+    if (data == "EMAG_ON") // Turn on electromagnet cluster
     {
       digitalWrite(EMAGNET_PIN, HIGH);
+      delay(1000);
+      Serial.println("Done");
     }
-    else if (data == "EMAGNET_OFF") // Turn off electromagnet cluster
+    else if (data == "EMAG_OFF") // Turn off electromagnet cluster
     {
       digitalWrite(EMAGNET_PIN, LOW);
+      delay(1000);
+      Serial.println("Done");
     }
     else if (data == "LIGHTS_ON") // Turn on LED strip
     {
       digitalWrite(LEDSTRIP_PIN, HIGH);
+      Serial.println("Done");
     }
     else if (data == "LIGHTS_OFF") // Turn off LED strip
     {
       digitalWrite(LEDSTRIP_PIN, LOW);
+      Serial.println("Done");
     }
     else if (data == "LID_OPEN") // Open the input lid
     {
@@ -248,10 +254,12 @@ void loop()
     else if (data == "VAC_ON")  //  Turn on vacuum pump
     {
       digitalWrite(VAC_MOTOR_PIN,HIGH);
+      Serial.println("Done");
     }
     else if (data =="VAC_OFF")  // Turn off vacuum pump
     {
       digitalWrite(VAC_MOTOR_PIN,LOW);
+      Serial.println("Done");
     }
     else if (data == "GATE_CLOSE") // Close the gate
     {
@@ -271,18 +279,22 @@ void loop()
     else if (data == "GLED_ON") // Turn on Green LED
     {
       digitalWrite(GREENLED_PIN, HIGH);
+      Serial.println("Done");
     }
     else if (data == "GLED_OFF") // Turn off Green LED
     {
       digitalWrite(GREENLED_PIN, LOW);
+      Serial.println("Done");
     }
     else if (data == "RLED_ON") // Turn on Red LED
     {
       digitalWrite(REDLED_PIN, HIGH);
+      Serial.println("Done");
     }
     else if (data == "RLED_OFF") // Turn off Red LED
     {
       digitalWrite(REDLED_PIN, LOW);
+      Serial.println("Done");
     }
 
     if (data=="Test")
