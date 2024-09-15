@@ -41,7 +41,7 @@ unsigned long lastDebounceTime = 0;
 
 
 int i =0;
-
+String data;
 
 // Function declarations
 void TestLoop();
@@ -83,30 +83,31 @@ void resetDriver()
 // Function to open the gripper
 void gripperOpen()
 {
+//   resetDriver();
+//   i=0;
+//   stepper.setSpeed(1000000);
+//   while (i<2500)
+//   {
+//     stepper.runSpeed();
+//     i++;
+//     delay(1);
+//   }
+//   stepper.stop();
+//   stepper.setCurrentPosition(0); // Set current position as home
+
   resetDriver();
-  i=0;
-  stepper.setSpeed(1000000);
   
-  Serial.print("open");
-  while (i<2500)
+  stepper.setSpeed(1000000);
+  while (Serial.available()==0)
   {
     stepper.runSpeed();
-    i++;
     delay(1);
   }
   stepper.stop();
   stepper.setCurrentPosition(0); // Set current position as home
 
-//   resetDriver();
-  
-//   stepper.setSpeed(500000);
-//   while (!stalled)
-//   {
-//     stepper.runSpeed();
-//     Serial.println(driver.SG_RESULT());
-//   }
-//   stepper.stop();
-//   stepper.setCurrentPosition(0); // Set current position as home
+  data = Serial.readStringUntil('\n'); // Read command from Pi
+  Serial.println("OK");
 }
 
 // Function to close the gripper
@@ -115,8 +116,8 @@ void gripperClose()
   resetDriver();
   stepper.setSpeed(-1000000);
   i=0;
-  Serial.print("close");
-  while (i<2500)
+  // Serial.print("close");
+  while (i<6000)
   {
     stepper.runSpeed();
     i++;
@@ -190,11 +191,13 @@ void TMC2209settings()
   driver.TCOOLTHRS(0xFFFFF); // 20bit max
   driver.SGTHRS(STALL_VALUE);
 
+
   stepper.setMaxSpeed(1000000);
   stepper.setAcceleration(5000); // 2000mm/s^2
   stepper.setPinsInverted(false, false, true);
   stepper.enableOutputs();
   
+  // digitalWrite(EN_PIN, HIGH); //TEMPORARY OFF??
 }
 void loop()
 {
@@ -202,7 +205,7 @@ void loop()
   if (Serial.available() > 0)
   {                                             // Check presence of data at serial port
     
-    String data = Serial.readStringUntil('\n'); // Read command from Pi
+    data = Serial.readStringUntil('\n'); // Read command from Pi
     Serial.println("OK");                       // Feedback to Pi on receiving command
 
 
@@ -232,7 +235,7 @@ void loop()
     }
     else if (data == "LID_OPEN") // Open the input lid
     {
-      lid_servo.write(70); // Position can be adjusted as desired
+      lid_servo.write(110); // Position can be adjusted as desired
       while (digitalRead(LID_LIMIT_PIN) ==LOW){
 
       }
@@ -241,7 +244,7 @@ void loop()
     }
     else if (data == "LID_CLOSE") // Close the input lid
     {
-      lid_servo.write(110); // Position can be adjusted as desired
+      lid_servo.write(70); // Position can be adjusted as desired
       delay(2000);
       lid_servo.write(90);
       Serial.println("Done");
@@ -268,7 +271,9 @@ void loop()
     }
     else if (data == "G_OPEN") // Open gripper
     {
+    
       gripperOpen();
+      delay(300); //TRIED
       Serial.println("Done");
     }
     else if (data == "G_CLOSE") // Close gripper
@@ -480,6 +485,3 @@ void TestLoop()
   }
   }
 }
-
-
-
