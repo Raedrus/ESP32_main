@@ -12,7 +12,7 @@
 #define LID_LIMIT_PIN 15
 #define VAC_MOTOR_PIN 33
 
-// TMC2209 stepper driver initiation
+//----------TMC2209 stepper driver initiation---------//
 #define DIR_PIN 2          // Direction
 #define STEP_PIN 4         // Step
 #define STALL_PIN 18        // Connected to DIAG pin on the TMC2209
@@ -25,15 +25,25 @@ AccelStepper stepper = AccelStepper(stepper.DRIVER, STEP_PIN, DIR_PIN);
 bool startup = true; // set false after homing
 bool stalled = false;
 
-// Servo initiation
+//-------------------Servo initiation--------------------//
 Servo lid_servo;
 Servo gate_servo;
+Servo plat_servo;
+
+//  Lid servo settings
 int lid_init_pos = 90;
+#define LID_SERVO_PIN 12
+
+//  Gate servo settings
+#define GATE_SERVO_PIN 13
 int gate_init_pos = 100;
 int gate_open_pos2 = 23;
 int gate_open_pos1 = 45;
-#define LID_SERVO_PIN 12
-#define GATE_SERVO_PIN 13
+
+//  Platform servo settings
+#define PLAT_SERVO_PIN 14
+int plat_neutral_pos = 100;
+int plat_left_pos = 
 
 // Button debouncing variables
 #define DEBOUNCE_TIME 40
@@ -152,8 +162,9 @@ void setup()
   pinMode(GREENLED_PIN, OUTPUT);
   pinMode(REDLED_PIN, OUTPUT);
   pinMode(EN_PIN,OUTPUT);
-  // Enable interrupt for EStop Button
-  // attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, RISING);
+
+  //Enable interrupt for EStop Button
+  attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, FALLING);
 
   // Initiate serial comms with TMC2209 stepper driver
   Serial2.begin(115200);
@@ -176,6 +187,10 @@ void setup()
   gate_servo.setPeriodHertz(50);                // Set period for servo
   gate_servo.attach(GATE_SERVO_PIN, 500, 2400); // Attaches the servo pin 13 to its servo object
   gate_servo.write(gate_init_pos);              // Moves the servo to desired home position
+
+  plat_servo.setPeriodHertz(50);               // Set period for servo
+  plat_servo.attach(PLAT_SERVO_PIN, 500, 2400); // Attaches the servo at pin 12 to its servo object
+  plat_servo.write(plat_neutral_pos);              // Moves the servo to desired home position
   // using default min/max of 1000us and 2000us
   // different servos may require different min/max settings
   // for an accurate 0 to 180 sweep
@@ -264,6 +279,18 @@ void loop()
     {
       gripperClose();
       Serial.println("Done");
+    }
+    else if (data == "PLAT_R")
+    {
+      
+    }
+    else if (data == "PLAT_L")
+    {
+      
+    }
+    else if (data == "PLAT_N")
+    {
+      
     }
     else if (data == "GLED_ON") // Turn on Green LED
     {
