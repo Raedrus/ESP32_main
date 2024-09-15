@@ -30,7 +30,8 @@ Servo lid_servo;
 Servo gate_servo;
 int lid_init_pos = 90;
 int gate_init_pos = 100;
-int gate_open_pos = 23;
+int gate_open_pos2 = 23;
+int gate_open_pos1 = 45;
 #define LID_SERVO_PIN 12
 #define GATE_SERVO_PIN 13
 
@@ -214,23 +215,13 @@ void loop()
     if (data == "EMAG_ON") // Turn on electromagnet cluster
     {
       digitalWrite(EMAGNET_PIN, HIGH);
-      delay(1000);
+      delay(500);
       Serial.println("Done");
     }
     else if (data == "EMAG_OFF") // Turn off electromagnet cluster
     {
       digitalWrite(EMAGNET_PIN, LOW);
-      delay(1000);
-      Serial.println("Done");
-    }
-    else if (data == "LIGHTS_ON") // Turn on LED strip
-    {
-      digitalWrite(LEDSTRIP_PIN, HIGH);
-      Serial.println("Done");
-    }
-    else if (data == "LIGHTS_OFF") // Turn off LED strip
-    {
-      digitalWrite(LEDSTRIP_PIN, LOW);
+      delay(500);
       Serial.println("Done");
     }
     else if (data == "LID_OPEN") // Open the input lid
@@ -245,23 +236,16 @@ void loop()
     else if (data == "LID_CLOSE") // Close the input lid
     {
       lid_servo.write(70); // Position can be adjusted as desired
-      delay(2000);
+      delay(800);
       lid_servo.write(90);
       Serial.println("Done");
     }
     else if (data == "GATE_OPEN") // Open the gate
     {
-      gate_servo.write(gate_open_pos); // Position can be adjusted as desired
-      Serial.println("Done");
-    }
-    else if (data == "VAC_ON")  //  Turn on vacuum pump
-    {
-      digitalWrite(VAC_MOTOR_PIN,HIGH);
-      Serial.println("Done");
-    }
-    else if (data =="VAC_OFF")  // Turn off vacuum pump
-    {
-      digitalWrite(VAC_MOTOR_PIN,LOW);
+      gate_servo.write(gate_open_pos1); // Position can be adjusted as desired
+      delay(500);
+      gate_servo.write(gate_open_pos2); // Position can be adjusted as desired
+      delay(1000);
       Serial.println("Done");
     }
     else if (data == "GATE_CLOSE") // Close the gate
