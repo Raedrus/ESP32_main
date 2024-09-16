@@ -41,9 +41,10 @@ int gate_open_pos2 = 23;
 int gate_open_pos1 = 45;
 
 //  Platform servo settings
-#define PLAT_SERVO_PIN 14
-int plat_neutral_pos = 100;
-int plat_left_pos = 
+#define PLAT_SERVO_PIN 23
+int plat_neutral_pos = 35;
+int plat_left_pos = 20;
+int plat_right_pos = 50;
 
 // Button debouncing variables
 #define DEBOUNCE_TIME 40
@@ -194,6 +195,7 @@ void setup()
   // using default min/max of 1000us and 2000us
   // different servos may require different min/max settings
   // for an accurate 0 to 180 sweep
+
 }
 
 void TMC2209settings()
@@ -282,15 +284,18 @@ void loop()
     }
     else if (data == "PLAT_R")
     {
-      
+      plat_servo.write(plat_right_pos);
+      Serial.println("Done");
     }
     else if (data == "PLAT_L")
     {
-      
+      plat_servo.write(plat_left_pos);
+      Serial.println("Done");
     }
     else if (data == "PLAT_N")
     {
-      
+      plat_servo.write(plat_neutral_pos);
+      Serial.println("Done");
     }
     else if (data == "GLED_ON") // Turn on Green LED
     {
