@@ -42,9 +42,9 @@ int gate_open_pos1 = 45;
 
 //  Platform servo settings
 #define PLAT_SERVO_PIN 23
-int plat_neutral_pos = 35;
-int plat_left_pos = 20;
-int plat_right_pos = 50;
+int plat_neutral_pos = 24;
+int plat_left_pos = plat_neutral_pos-15;
+int plat_right_pos = plat_neutral_pos+15;
 
 // Button debouncing variables
 #define DEBOUNCE_TIME 40
@@ -165,7 +165,7 @@ void setup()
   pinMode(EN_PIN,OUTPUT);
 
   //Enable interrupt for EStop Button
-  attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(ESTOP_PIN), EstopInterrupt, FALLING);
 
   // Initiate serial comms with TMC2209 stepper driver
   Serial2.begin(115200);
@@ -191,11 +191,13 @@ void setup()
 
   plat_servo.setPeriodHertz(50);               // Set period for servo
   plat_servo.attach(PLAT_SERVO_PIN, 500, 2400); // Attaches the servo at pin 12 to its servo object
+  
+  
+  delay(200);
   plat_servo.write(plat_neutral_pos);              // Moves the servo to desired home position
   // using default min/max of 1000us and 2000us
   // different servos may require different min/max settings
   // for an accurate 0 to 180 sweep
-
 }
 
 void TMC2209settings()
@@ -215,6 +217,7 @@ void TMC2209settings()
   stepper.setPinsInverted(false, false, true);
   stepper.enableOutputs();
   
+  
   // digitalWrite(EN_PIN, HIGH); //TEMPORARY OFF??
 }
 void loop()
@@ -232,14 +235,14 @@ void loop()
     if (data == "EMAG_ON") // Turn on electromagnet cluster
     {
       digitalWrite(EMAGNET_PIN, HIGH);
-      delay(500);
-      Serial.println("Done");
+      
+      // Serial.println("Done");
     }
     else if (data == "EMAG_OFF") // Turn off electromagnet cluster
     {
       digitalWrite(EMAGNET_PIN, LOW);
-      delay(500);
-      Serial.println("Done");
+      // delay(1000);
+      // Serial.println("Done");
     }
     else if (data == "LID_OPEN") // Open the input lid
     {
@@ -248,77 +251,76 @@ void loop()
 
       }
       lid_servo.write(90);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "LID_CLOSE") // Close the input lid
     {
       lid_servo.write(70); // Position can be adjusted as desired
       delay(800);
       lid_servo.write(90);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "GATE_OPEN") // Open the gate
     {
       gate_servo.write(gate_open_pos1); // Position can be adjusted as desired
       delay(500);
       gate_servo.write(gate_open_pos2); // Position can be adjusted as desired
-      delay(1000);
-      Serial.println("Done");
+      // delay(1000);
+      // Serial.println("Done");
     }
     else if (data == "GATE_CLOSE") // Close the gate
     {
       gate_servo.write(gate_init_pos); // Position can be adjusted as desired
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "G_OPEN") // Open gripper
     {
     
       gripperOpen();
-      delay(300); //TRIED
-      Serial.println("Done");
+      // delay(300); //TRIED
+      // Serial.println("Done");
     }
     else if (data == "G_CLOSE") // Close gripper
     {
       gripperClose();
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "PLAT_R")
     {
       plat_servo.write(plat_right_pos);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "PLAT_L")
     {
       plat_servo.write(plat_left_pos);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "PLAT_N")
     {
       plat_servo.write(plat_neutral_pos);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "GLED_ON") // Turn on Green LED
     {
       digitalWrite(GREENLED_PIN, HIGH);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "GLED_OFF") // Turn off Green LED
     {
       digitalWrite(GREENLED_PIN, LOW);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "RLED_ON") // Turn on Red LED
     {
       digitalWrite(REDLED_PIN, HIGH);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
     else if (data == "RLED_OFF") // Turn off Red LED
     {
       digitalWrite(REDLED_PIN, LOW);
-      Serial.println("Done");
+      // Serial.println("Done");
     }
-
-    if (data=="Test")
+    else if (data=="Test")
     {
       Serial.print("Testing Mode. Input test command or exit: ");
       TestLoop();
@@ -327,7 +329,9 @@ void loop()
     {
       Serial.println("Invalid input");
     }
-  
+    
+    delay(100);
+    Serial.println("Done");
   }
 
 }
