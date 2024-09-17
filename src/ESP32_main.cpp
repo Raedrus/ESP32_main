@@ -54,6 +54,12 @@ unsigned long lastDebounceTime = 0;
 
 int i =0;
 String data;
+// Constants for PWM
+const int pwmChannel = 9;     // Use PWM channel 0
+const int pwmFreq = 20000;    // Set frequency to 20kHz
+const int pwmResolution = 8;  // Set resolution to 8 bits (0-255 for duty cycle)
+const int pwmPin = 27;        // GPIO pin 27
+
 
 // Function declarations
 void TestLoop();
@@ -158,7 +164,7 @@ void setup()
   // Initiate mode of IO pins
   pinMode(ESTOP_PIN, INPUT_PULLUP);
   pinMode(LID_LIMIT_PIN, INPUT_PULLUP);
-  pinMode(EMAGNET_PIN, OUTPUT);
+//  pinMode(EMAGNET_PIN, OUTPUT);
   pinMode(LEDSTRIP_PIN, OUTPUT);
   pinMode(GREENLED_PIN, OUTPUT);
   pinMode(REDLED_PIN, OUTPUT);
@@ -170,12 +176,12 @@ void setup()
   // Initiate serial comms with TMC2209 stepper driver
   Serial2.begin(115200);
 
+  
+
   // Enable interrupt for motor stall
   attachInterrupt(digitalPinToInterrupt(STALL_PIN), stallInterrupt, RISING);
 
   TMC2209settings(); // Initialize TMC2209 Stepper Driver
-
-
   // Allow allocation of all timers
   // ESP32PWM::allocateTimer(0);
   // ESP32PWM::allocateTimer(1);
@@ -192,19 +198,29 @@ void setup()
   plat_servo.setPeriodHertz(50);               // Set period for servo
   plat_servo.attach(PLAT_SERVO_PIN, 500, 2400); // Attaches the servo at pin 12 to its servo object
   
-  
+  //EMAG_PWM
+  // Configure PWM channel, frequency, and resolution
+  ledcSetup(pwmChannel, pwmFreq, pwmResolution);
+  // Attach GPIO 27 to the PWM channel
+  ledcAttachPin(pwmPin, pwmChannel);
+  // Start PWM with a duty cycle of 128 (50% duty cycle)
+  ledcWrite(pwmChannel, 128);
   delay(200);
   plat_servo.write(plat_neutral_pos);              // Moves the servo to desired home position
   // using default min/max of 1000us and 2000us
   // different servos may require different min/max settings
   // for an accurate 0 to 180 sweep
+  
+
+  ledcWrite(pwmChannel, 0);
+
 }
 
 void TMC2209settings()
 {
-  digitalWrite(EN_PIN, LOW);
+  digitalWrite(EN_PIN, LOW); //HIGH = OFF    LOW = ON
   driver.begin();          // Initiate pins and registeries
-  driver.rms_current(1800); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
+  driver.rms_current(1500); // Set stepperA current to 600mA. The command is the same as command TMC2130.setCurrent(600, 0.11, 0.5);
   driver.pwm_autograd(1);  // Enable automatic gradient adaptation
   driver.pwm_autoscale(1);
   driver.microsteps(32);
@@ -220,27 +236,44 @@ void TMC2209settings()
   
   // digitalWrite(EN_PIN, HIGH); //TEMPORARY OFF??
 }
+
+
+
+
+
 void loop()
 {
 
   if (Serial.available() > 0)
   {                                             // Check presence of data at serial port
     
-    data = Serial.readStringUntil('\n'); // Read command from Pi
+    data = Serial.readStringUntil('\n');        // Read command from Pi
     Serial.println("OK");                       // Feedback to Pi on receiving command
 
-
-
-
-    if (data == "EMAG_ON") // Turn on electromagnet cluster
+    if (data == "READY"){
+      // digitalWrite(EN_PIN, LOW); // ON TMC
+      digitalWrite(GREENLED_PIN, HIGH);
+    }
+    else if (data == "REST"){
+      // digitalWrite(EMAGNET_PIN, LOW); 
+      ledcWrite(pwmChannel, 0); // OFF EMAG
+      digitalWrite(EN_PIN, HIGH); // OFF TMC
+      digitalWrite(GREENLED_PIN, HIGH);
+    }
+    else if (data == "EMAG_ON") // Turn on electromagnet cluster
     {
-      digitalWrite(EMAGNET_PIN, HIGH);
-      
+      digitalWrite(EN_PIN, HIGH); // OFF TMC
+      // digitalWrite(EMAGNET_PIN, HIGH);
+    
+      ledcWrite(pwmChannel, 128); // ON EMAG
       // Serial.println("Done");
     }
     else if (data == "EMAG_OFF") // Turn off electromagnet cluster
     {
-      digitalWrite(EMAGNET_PIN, LOW);
+      // digitalWrite(EMAGNET_PIN, LOW);
+      ledcWrite(pwmChannel, 0); //OFF EMAG
+
+      digitalWrite(EN_PIN, LOW); // ON TMC    
       // delay(1000);
       // Serial.println("Done");
     }
